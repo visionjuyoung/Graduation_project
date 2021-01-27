@@ -6,4 +6,5 @@
 트렐로 주소 : https://trello.com/b/DLkKbCis/project
 
 시스템 구성
-객체 분석 및 행동분석 : yolo v4 를 사용하여 객체분석, coco model 을 사용하여 행동분석
+객체 분석 및 행동 분석 : yolo v4를 사용하여 객체 분석, coco 모델을 사용하여 행동 분석
+스트리밍 서버 : flask를 사용하여 영상 스트리밍
