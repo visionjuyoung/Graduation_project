@@ -1,5 +1,6 @@
 import cv2
 import time
+import math
 import numpy as np
 import argparse
 
@@ -139,9 +140,21 @@ def getPersonwiseKeypoints(valid_pairs, invalid_pairs):
                     personwiseKeypoints = np.vstack([personwiseKeypoints, row])
     return personwiseKeypoints
 
+def calculate_degree(point_1, point_2, frame):
+    dx = point_2[0] - point_1[0]
+    dy = point_2[1] - point_1[1]
+    rad = math.atan2(abs(dy), abs(dx))
+
+    deg = rad * 180 / math.pi
+
+    if deg < 45:
+        string = "bend"
+        cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
+        print(f"[degree] {deg} ({string})")
+
 threshold = 0.1
 input_source = 0
-rtsp_source ='rtsp://172.30.1.36:8555/unicast'
+# rtsp_source ='rtsp://172.30.1.36:8555/unicast'
 cap = cv2.VideoCapture(input_source)
 hasFrame, frame = cap.read()
 
@@ -210,6 +223,9 @@ while cv2.waitKey(1) < 0:
             B = np.int32(keypoints_list[index.astype(int), 0])
             A = np.int32(keypoints_list[index.astype(int), 1])
             cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
+            #기울기 계산
+            if colors[i] == [0,255,0]:
+                calculate_degree((B[0], A[0]), (B[1], A[1]), frameClone)
 
     cv2.putText(frame, "time taken = {:.2f} sec".format(time.time() - t), (50, 50), cv2.FONT_HERSHEY_COMPLEX, .8,
                 (255, 50, 0), 2, lineType=cv2.LINE_AA)
