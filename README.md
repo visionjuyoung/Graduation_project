@@ -11,16 +11,19 @@
 >
 > 라즈베리파이 카메라모듈 V2(RPI 8MP CAMERA BOARD)  
 > >사양  
-> >이미지 센서 : Sony IMX 219 PQ CMOS image seonsor in a fixed-focus module  
+> >이미지 센서 : Sony IMX 219 PQ CMOS image seonsor in a fixed-focus module 
+> >방식 : RTSP 서버를 사용하여 IP주소 할당 후 IP카메라 처럼 사용
 
 > ### 소프트웨어  
 > 행동인식 및 행동분석
 > >종류
 > >객체 인식 : YOLO v4
 > >행동 인식 : Openpose
+> >행동 인식 알고리즘 : BOTTOM-UP방식을 사용하여 다수의 사람 인식
 >
 > 서버
-> >flask
+> >사용 서버 : flask
+> >수행 기능 : 행동인식 및 행동분석 알고리즘을 실행하고 APP과 통신
 >
 > 데이터베이스
 > >Firebase 
