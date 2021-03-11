@@ -3,6 +3,7 @@ import time
 import math
 import numpy as np
 import argparse
+import datetime
 
 parser = argparse.ArgumentParser(description='Run keypoint detection')
 parser.add_argument("--device", default="gpu", help="Device to inference on")
@@ -152,6 +153,8 @@ def calculate_degree(point_1, point_2, frame):
         cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
         print(f"[degree] {deg} ({string})")
 
+    return True
+
 threshold = 0.1
 input_source = 0
 # rtsp_source ='rtsp://172.30.1.36:8555/unicast'
@@ -170,7 +173,9 @@ elif args.device == "gpu":
     print("Using GPU device")
 
 while cv2.waitKey(1) < 0:
+    count = 0
     t = time.time()
+    swtich_degree = False
     hasFrame, frame = cap.read()
     frameCopy = np.copy(frame)
     if not hasFrame:
@@ -225,7 +230,11 @@ while cv2.waitKey(1) < 0:
             cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
             #기울기 계산
             if colors[i] == [0,255,0]:
-                calculate_degree((B[0], A[0]), (B[1], A[1]), frameClone)
+                swtich_degree = calculate_degree((B[0], A[0]), (B[1], A[1]), frameClone)
+                if swtich_degree == True:
+                    now = datetime.datetime.now().strftime("%d_%H-%M-%S")
+                    cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame)
+                    swtich_degree = False
 
     cv2.putText(frame, "time taken = {:.2f} sec".format(time.time() - t), (50, 50), cv2.FONT_HERSHEY_COMPLEX, .8,
                 (255, 50, 0), 2, lineType=cv2.LINE_AA)
