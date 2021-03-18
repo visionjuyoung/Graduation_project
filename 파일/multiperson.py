@@ -4,6 +4,14 @@ import math
 import numpy as np
 import argparse
 import datetime
+import serial
+print('serial ' + serial.__version__)
+
+# Set a PORT Number & baud rate
+PORT = 'COM5'
+BaudRate = 9600
+
+ARD= serial.Serial(PORT,BaudRate)
 
 parser = argparse.ArgumentParser(description='Run keypoint detection')
 parser.add_argument("--device", default="gpu", help="Device to inference on")
@@ -29,7 +37,7 @@ mapIdx = [[31,32], [39,40], [33,34], [35,36], [41,42], [43,44],
 
 colors = [[0,100,255], [0,100,255], [0,255,255], [0,100,255], [0,255,255], [0,100,255],
          [0,255,0], [255,200,100], [255,0,255], [0,255,0], [255,200,100], [255,0,255],
-         [0,0,255], [255,0,0], [200,200,0], [255,0,0], [200,200,0], [0,0,0]]
+         [0,0,255], [255,0,0], [200,201,0], [254,0,0], [200,200,0], [0,0,0]]
 
 inWidth = 168
 inHeight = 168
@@ -152,11 +160,17 @@ def calculate_degree(point_1, point_2, frame):
         string = "bend"
         cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
         print(f"[degree] {deg} ({string})")
+        op = 'a'
+        ARD.write(op.encode())
+    elif deg > 45:
+        op = 'b'
+        ARD.write(op.encode())
 
     return True
 
 threshold = 0.1
 input_source = 0
+mp4_source = "D:\\lib\\test3.png"
 # rtsp_source ='rtsp://172.30.1.36:8555/unicast'
 cap = cv2.VideoCapture(input_source)
 hasFrame, frame = cap.read()
@@ -178,6 +192,7 @@ while cv2.waitKey(1) < 0:
     swtich_degree = False
     hasFrame, frame = cap.read()
     frameCopy = np.copy(frame)
+
     if not hasFrame:
         cv2.waitKey()
         break
@@ -231,10 +246,11 @@ while cv2.waitKey(1) < 0:
             #기울기 계산
             if colors[i] == [0,255,0]:
                 swtich_degree = calculate_degree((B[0], A[0]), (B[1], A[1]), frameClone)
-                if swtich_degree == True:
-                    now = datetime.datetime.now().strftime("%d_%H-%M-%S")
-                    cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame)
-                    swtich_degree = False
+
+    if swtich_degree == True:
+        now = datetime.datetime.now().strftime("%d_%H-%M-%S")
+        cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame)
+        swtich_degree = False
 
     cv2.putText(frame, "time taken = {:.2f} sec".format(time.time() - t), (50, 50), cv2.FONT_HERSHEY_COMPLEX, .8,
                 (255, 50, 0), 2, lineType=cv2.LINE_AA)
