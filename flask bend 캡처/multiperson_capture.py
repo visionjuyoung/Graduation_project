@@ -261,4 +261,4 @@ def calc():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    app.run(host="211.252.153.151", port=5000, debug=True)
+    app.run(host="본인 ip주소", port=5000, debug=True)
