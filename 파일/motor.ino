@@ -1,5 +1,6 @@
 #include <Servo.h>
-Servo servo;
+Servo servo1;
+Servo servo2;
 
 #define OFFMODE -1
 #define ONMODE 1
@@ -10,8 +11,10 @@ int state = OFFMODE;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  servo.attach(7);
-  servo.write(0);
+  servo1.attach(7);
+  servo2.attach(8);
+  servo1.write(0);
+  servo2.write(0);
 }
 
 void loop() {
@@ -20,8 +23,10 @@ void loop() {
     ch = Serial.read();
   }
   if(ch=='a'){
-    servo.write(90);
+    servo1.write(90);
+    servo2.write(90);
   }else if(ch=='b'){
-    servo.write(0);
+    servo1.write(0);
+    servo2.write(0);
   }
 }
