@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">imageTestFlask</string>
+    <string name="baseUrl">http://221.147.198.248:5000/</string>
+</resources>
