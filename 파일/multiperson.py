@@ -66,9 +66,16 @@ def gen():
         print("Using GPU device")
 
     while cv2.waitKey(1) < 0:
-        t = time.time()
+         t = time.time()
+        swtich_degree = False
         hasFrame, frame = cap.read()
         frameCopy = np.copy(frame)
+        count = count + 1
+        if count == 600 :
+            now = datetime.datetime.now().strftime("%d-%H-%M-%S")
+            cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame)
+            count = 0
+            
         if not hasFrame:
             cv2.waitKey()
             break
@@ -108,6 +115,7 @@ def gen():
 
             print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
             keypoints_with_id = []
+            minVal, prob, minLoc, point = cv2.minMaxLoc(probMap)
 
             for i in range(len(keypoints)):
                 keypoints_with_id.append(keypoints[i] + (keypoint_id,))
@@ -228,25 +236,24 @@ def gen():
                 A = np.int32(keypoints_list[index.astype(int), 1])
                 cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
                 # 기울기 계산
-                if colors[i] == [0, 255, 0]:
-                    dx = (B[1], A[1])[0] - (B[0], A[0])[0]
-                    dy = (B[1], A[1])[1] - (B[0], A[0])[1]
+                if colors[i] == [0, 255, 0]:           
+                    # calculate_degree
+                    dx = point_2[0] - point_1[0]
+                    dy = point_2[1] - point_1[1]
                     rad = math.atan2(abs(dy), abs(dx))
 
                     deg = rad * 180 / math.pi
 
                     if deg < 45:
                         string = "bend"
-                        cv2.putText(frameClone, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
+                        cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
                         print(f"[degree] {deg} ({string})")
-                        # 캡처 (capture_min)
-                        now = datetime.datetime.now().strftime("%d-%H-%M-%S")
-                        cv2.imwrite("D:\\capture\\ " + str(now) + ".png", frame)
                         op = 'a'
                         ARD.write(op.encode())
                     elif deg > 45:
                         op = 'b'
                         ARD.write(op.encode())
+                    # calculate_degree
 
         cv2.putText(frame, "time taken = {:.2f} sec".format(time.time() - t), (50, 50), cv2.FONT_HERSHEY_COMPLEX, .8,
                     (255, 50, 0), 2, lineType=cv2.LINE_AA)
