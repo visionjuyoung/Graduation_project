@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <form action="/" method="post">
+            <input type="text" name="name">
+            <button type="submit">Submit</button>
+        </form>
+        {% for task in todo %}
+            {{ task }}
+        {% endfor %}
+    </body>
+</html>
