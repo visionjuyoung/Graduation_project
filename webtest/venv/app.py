@@ -1,5 +1,12 @@
 import pyrebase
 from flask import *
+import os
+
+"""
+filelist = [f for f in os.listdir(".") if f.endswith(".jpg")]
+for f in filelist:
+    os.remove(os.path.join(".",f))
+"""
 
 config = {
     "apiKey": "AIzaSyAOksU2ogxblR2vUVczwffzmv-x15v2OJI",
@@ -9,24 +16,23 @@ config = {
     "storageBucket": "casptone-a2cbe.appspot.com",
     "messagingSenderId": "247150714233",
     "appId": "1:247150714233:web:31b6a3fdcc9d5138c5e3a8",
+    "serviceAccount": "serviceAccountKey.json"
 }
 
 firebase = pyrebase.initialize_app(config)
 
-db = firebase.database()
+storage = firebase.storage()
+
 
 app = Flask(__name__)
 
 @app.route('/', methods=['POST', 'GET'])
 def main():
     if request.method == 'POST':
-        name = request.form['name']
-        db.child('todo').push(name)
-        todo = db.child('todo').get()
-        todo_list = todo.val()
-        return render_template('index.html', todo=todo_list.values())
+        upload = request.files['upload']
+        storage.child("images/new.png").put(upload)
+        return 'Successful'
     return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
-
