@@ -1,7 +1,5 @@
 import pyrebase
 from flask import *
-import os
-
 """
 filelist = [f for f in os.listdir(".") if f.endswith(".jpg")]
 for f in filelist:
