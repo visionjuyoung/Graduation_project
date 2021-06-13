@@ -1,4 +1,3 @@
-from flask import Flask, render_template, Response
 import cv2
 import time
 import math
@@ -7,19 +6,42 @@ import argparse
 import datetime
 import serial
 import threading
-#print('serial ' + serial.__version__)
+import pyrebase
+from flask import *
+import os
+
+# print('serial ' + serial.__version__)
+
+#파이어베이스 정보
+config = {
+    "apiKey": "AIzaSyAOksU2ogxblR2vUVczwffzmv-x15v2OJI",
+    "authDomain": "casptone-a2cbe.firebaseapp.com",
+    "databaseURL": "https://casptone-a2cbe-default-rtdb.firebaseio.com",
+    "projectId": "casptone-a2cbe",
+    "storageBucket": "casptone-a2cbe.appspot.com",
+    "messagingSenderId": "247150714233",
+    "appId": "1:247150714233:web:31b6a3fdcc9d5138c5e3a8",
+    "serviceAccount": "C:\\Users\\User\\test\\serviceAccountKey.json"
+}
+
+#파이어베이스 연결
+firebase = pyrebase.initialize_app(config)
+
+storage = firebase.storage()
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def index():
-    return render_template('multiperson.html')
+    return render_template('video.html') #html파일 이름 multiperson 이나 video
+
 
 def gen():
-    PORT = 'COM7'
-    BaudRate = 9600
+    #PORT = 'COM7'
+    #BaudRate = 9600
 
-    ARD= serial.Serial(PORT,BaudRate)
+    #ARD = serial.Serial(PORT, BaudRate)
 
     parser = argparse.ArgumentParser(description='Run keypoint detection')
     parser.add_argument("--device", default="gpu", help="Device to inference on")
@@ -94,7 +116,7 @@ def gen():
         threshold = 0.1
 
         post_y = 0
-        rHipY = 0 
+        rHipY = 0
         lHipY = 0
         neck = 0
         flag_for = True
@@ -104,7 +126,7 @@ def gen():
             probMap = cv2.resize(probMap, (frame.shape[1], frame.shape[0]))
 
             # getKeypoints
-            mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
+            mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
             mapMask = np.uint8(mapSmooth > threshold)
             keypoints = []
             contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -118,9 +140,9 @@ def gen():
             # getKeyPoints
 
             print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
-            if keypointsMapping[part] == "Neck" :
-                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
-                mapMask = np.uint8(mapSmooth>threshold)
+            if keypointsMapping[part] == "Neck":
+                mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
+                mapMask = np.uint8(mapSmooth > threshold)
                 keypoints = []
                 contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                 for cnt in contours:
@@ -128,11 +150,11 @@ def gen():
                     blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
                     maskedProbMap = mapSmooth * blobMask
                     _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
-                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
+                    keypoints.append(maxLoc + (probMap[maxLoc[1], maxLoc[0]],))
                     neck = maxLoc[1]
-            elif keypointsMapping[part] == "R-Hip" :
-                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
-                mapMask = np.uint8(mapSmooth>threshold)
+            elif keypointsMapping[part] == "R-Hip":
+                mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
+                mapMask = np.uint8(mapSmooth > threshold)
                 keypoints = []
                 contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                 for cnt in contours:
@@ -140,11 +162,11 @@ def gen():
                     blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
                     maskedProbMap = mapSmooth * blobMask
                     _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
-                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
-                    rHipY = maxLoc[1] 
-            elif keypointsMapping[part] == "L-Hip" :
-                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
-                mapMask = np.uint8(mapSmooth>threshold)
+                    keypoints.append(maxLoc + (probMap[maxLoc[1], maxLoc[0]],))
+                    rHipY = maxLoc[1]
+            elif keypointsMapping[part] == "L-Hip":
+                mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
+                mapMask = np.uint8(mapSmooth > threshold)
                 keypoints = []
                 contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                 for cnt in contours:
@@ -152,10 +174,10 @@ def gen():
                     blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
                     maskedProbMap = mapSmooth * blobMask
                     _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
-                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
+                    keypoints.append(maxLoc + (probMap[maxLoc[1], maxLoc[0]],))
                     lHipY = maxLoc[1]
             # print(neck, rHipY, lHipY)
-            if neck != 0 and rHipY != 0 and lHipY != 0 :
+            if neck != 0 and rHipY != 0 and lHipY != 0:
                 post_y = neck + rHipY + lHipY
 
             keypoints_with_id = []
@@ -280,7 +302,7 @@ def gen():
                 A = np.int32(keypoints_list[index.astype(int), 1])
                 cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
                 # 기울기 계산
-                if colors[i] == [0, 255, 0]:           
+                if colors[i] == [0, 255, 0]:
                     # calculate_degree
                     dx = B[0] - B[0]
                     dy = A[1] - A[1]
@@ -293,17 +315,19 @@ def gen():
                         cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
                         print(f"[degree] {deg} ({string})")
                         op = 'a'
-                        ARD.write(op.encode())
+                        #ARD.write(op.encode())
                     elif deg > 45:
                         op = 'b'
-                        ARD.write(op.encode())
+                        #ARD.write(op.encode())
                     # calculate_degree
 
-        if pre_Y - present_Y > 1000 : #숫자가 커질수록 민감도 높아짐
+        if pre_Y - present_Y > 500:  # 숫자가 커질수록 민감도 높아짐
             print("fall!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        now = datetime.datetime.now().strftime("%d_%H-%M-%S")
-        cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame) #데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
-    
+            filename = datetime.datetime.now().strftime("%H-%M-%S")
+            foldername = datetime.datetime.now().strftime("%F")
+            cv2.imwrite("C:\\capture\\ " + str(filename) + ".png", frame)  # 데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
+            storage.child(str(filename) + ".png").put("C:\\capture\\ " + str(filename) + ".png")
+            
         pre_Y = present_Y
         present_Y = 0
 
@@ -319,10 +343,12 @@ def gen():
     cv2.waitKey(0)
     del (cap)
 
+
 @app.route('/calculation')
 def calculation():
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
