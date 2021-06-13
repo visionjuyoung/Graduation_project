@@ -49,6 +49,9 @@ def gen():
     inWidth = 168
     inHeight = 168
 
+    pre_Y = 0
+    present_Y = 0
+
     threshold = 0.1
     input_source = 0
     cap = cv2.VideoCapture(input_source)
@@ -66,16 +69,11 @@ def gen():
         print("Using GPU device")
 
     while cv2.waitKey(1) < 0:
-         t = time.time()
+        count = 0
+        t = time.time()
         swtich_degree = False
         hasFrame, frame = cap.read()
         frameCopy = np.copy(frame)
-        count = count + 1
-        if count == 600 :
-            now = datetime.datetime.now().strftime("%d-%H-%M-%S")
-            cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame)
-            count = 0
-            
         if not hasFrame:
             cv2.waitKey()
             break
@@ -94,6 +92,12 @@ def gen():
         keypoints_list = np.zeros((0, 3))
         keypoint_id = 0
         threshold = 0.1
+
+        post_y = 0
+        rHipY = 0 
+        lHipY = 0
+        neck = 0
+        flag_for = True
 
         for part in range(nPoints):
             probMap = output[0, part, :, :]
@@ -114,6 +118,46 @@ def gen():
             # getKeyPoints
 
             print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
+            if keypointsMapping[part] == "Neck" :
+                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
+                mapMask = np.uint8(mapSmooth>threshold)
+                keypoints = []
+                contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                for cnt in contours:
+                    blobMask = np.zeros(mapMask.shape)
+                    blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
+                    maskedProbMap = mapSmooth * blobMask
+                    _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
+                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
+                    neck = maxLoc[1]
+            elif keypointsMapping[part] == "R-Hip" :
+                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
+                mapMask = np.uint8(mapSmooth>threshold)
+                keypoints = []
+                contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                for cnt in contours:
+                    blobMask = np.zeros(mapMask.shape)
+                    blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
+                    maskedProbMap = mapSmooth * blobMask
+                    _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
+                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
+                    rHipY = maxLoc[1] 
+            elif keypointsMapping[part] == "L-Hip" :
+                mapSmooth = cv2.GaussianBlur(probMap,(3,3),0,0)
+                mapMask = np.uint8(mapSmooth>threshold)
+                keypoints = []
+                contours, _ = cv2.findContours(mapMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                for cnt in contours:
+                    blobMask = np.zeros(mapMask.shape)
+                    blobMask = cv2.fillConvexPoly(blobMask, cnt, 1)
+                    maskedProbMap = mapSmooth * blobMask
+                    _, maxVal, _, maxLoc = cv2.minMaxLoc(maskedProbMap)
+                    keypoints.append( maxLoc+ (probMap[maxLoc[1], maxLoc[0]],))
+                    lHipY = maxLoc[1]
+            # print(neck, rHipY, lHipY)
+            if neck != 0 and rHipY != 0 and lHipY != 0 :
+                post_y = neck + rHipY + lHipY
+
             keypoints_with_id = []
             minVal, prob, minLoc, point = cv2.minMaxLoc(probMap)
 
@@ -123,7 +167,7 @@ def gen():
                 keypoint_id += 1
                 # Add the point to the list if the probability is greater than the threshold
             detected_keypoints.append(keypoints_with_id)
-
+        present_Y = post_y
         frameClone = frame.copy()
 
         for i in range(nPoints):
@@ -238,8 +282,8 @@ def gen():
                 # 기울기 계산
                 if colors[i] == [0, 255, 0]:           
                     # calculate_degree
-                    dx = point_2[0] - point_1[0]
-                    dy = point_2[1] - point_1[1]
+                    dx = B[0] - B[0]
+                    dy = A[1] - A[1]
                     rad = math.atan2(abs(dy), abs(dx))
 
                     deg = rad * 180 / math.pi
@@ -254,6 +298,14 @@ def gen():
                         op = 'b'
                         ARD.write(op.encode())
                     # calculate_degree
+
+        if pre_Y - present_Y > 1000 : #숫자가 커질수록 민감도 높아짐
+            print("fall!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        now = datetime.datetime.now().strftime("%d_%H-%M-%S")
+        cv2.imwrite("C:\\capture\\ "+ str(now) + ".png", frame) #데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
+    
+        pre_Y = present_Y
+        present_Y = 0
 
         cv2.putText(frame, "time taken = {:.2f} sec".format(time.time() - t), (50, 50), cv2.FONT_HERSHEY_COMPLEX, .8,
                     (255, 50, 0), 2, lineType=cv2.LINE_AA)
