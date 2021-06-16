@@ -326,7 +326,7 @@ def gen():
             filename = datetime.datetime.now().strftime("%H-%M-%S")
             foldername = datetime.datetime.now().strftime("%F")
             cv2.imwrite("C:\\capture\\ " + str(filename) + ".png", frame)  # 데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
-            storage.child(str(filename) + ".png").put("C:\\capture\\ " + str(filename) + ".png")
+            storage.child(str(foldername) + "/" + str(filename) + ".png" + ".png").put("C:\\capture\\ " + str(filename) + ".png")
             
         pre_Y = present_Y
         present_Y = 0
