@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "796371115502",
+    "project_id": "getimages-40e7e",
+    "storage_bucket": "getimages-40e7e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796371115502:android:c7e1f2e6dca080473702ff",
+        "android_client_info": {
+          "package_name": "kr.psk.kpu.getimage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796371115502-rduocaockfl4mgp2rh7efgntooqmc2eb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvCBRgHeUVUEtT3ioOMDLhAc91-66tvXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "796371115502-rduocaockfl4mgp2rh7efgntooqmc2eb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
