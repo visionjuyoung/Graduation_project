@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "247150714233",
+    "firebase_url": "https://casptone-a2cbe-default-rtdb.firebaseio.com",
+    "project_id": "casptone-a2cbe",
+    "storage_bucket": "casptone-a2cbe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247150714233:android:402280cc31a7d959c5e3a8",
+        "android_client_info": {
+          "package_name": "kr.psk.kpu.capstone_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqHpyqQpZ0IkDFq3ljN2muIy19rmfBHS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247150714233:android:a4802210d6b97b9fc5e3a8",
+        "android_client_info": {
+          "package_name": "kr.psk.kpu.imagetestflask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqHpyqQpZ0IkDFq3ljN2muIy19rmfBHS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
