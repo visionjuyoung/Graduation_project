@@ -8,6 +8,35 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:247150714233:android:445185c5745e4802c5e3a8",
+        "android_client_info": {
+          "package_name": "com.asd.asdsq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqHpyqQpZ0IkDFq3ljN2muIy19rmfBHS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "247150714233-1brpsg9i5gv1fdu07n94c2itei54qf9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:247150714233:android:402280cc31a7d959c5e3a8",
         "android_client_info": {
           "package_name": "kr.psk.kpu.capstone_application"

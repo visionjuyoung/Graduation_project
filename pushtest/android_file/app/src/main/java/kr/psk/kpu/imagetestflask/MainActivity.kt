@@ -5,10 +5,9 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.tasks.OnCompleteListener
+import com.firepush.Fire
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.ResponseBody
@@ -24,27 +23,32 @@ class MainActivity : AppCompatActivity() {
     lateinit var myRetrofit : Retrofit
     lateinit var myRetrofitAPI : RetrofitAPI // custom
     lateinit var myCallImage : retrofit2.Call<ResponseBody>
+    lateinit var pushtoken : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var serverkey = "AAAAOYtUnXk:APA91bGSzC-3SOeVbEgiu3uV_udbcGYk2vzKW9UpCdEghFsMrQBzoePYinKJBrU9HHWeL0EvMRhdarnXcE3rHxtQWqJt5z4EAKJecSCtVL1rHMNTDKQQq1eM3XbZZrEgLHDkx36p3wT2"
+        Fire.init(serverkey)
+        pushtoken = FirebaseInstanceId.getInstance().token.toString()
+        Log.d("dd123",pushtoken)
         setContentView(R.layout.activity_main)
 
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("FCM Log", "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-                val token = task.result!!.token
-                Log.d("FCM Log", "FCM 토큰: $token")
-                Toast.makeText(this@MainActivity, token, Toast.LENGTH_SHORT).show()
-            })
+
 
 
         setRetrofit()
         // 먼저 파일명을 가져와야 함
 
         button.setOnClickListener{
+            Log.d("dd","1")
+            Fire.create()
+                .setTitle("TITLE HERE")
+                .setBody("BODY HERE")
+                .setCallback { pushCallback, exception ->
+                    //get response here
+                }
+                .toIds("eBAOp5UUQxiuA6F9NsKc5T:APA91bGomx0X63bpVmgoeLlVSfN-YJ4U6EeW_xlnVow0QrtuZQGuaOScLzXcmrRDo8n8ItoRMgn-T48ntTINPRIc8le20IIV_9GQY_-jlibIGHwblXiQ4Vx5Htu2YaehJLJt4e3CHTcQ").push()
+            Log.d("dd","2")
             callImage()
         }
     }
