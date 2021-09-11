@@ -9,6 +9,29 @@ import threading
 import pyrebase
 from flask import *
 import os
+from pyfcm import FCMNotification
+
+#--------------------------------데베 부분
+import firebase_admin
+from firebase_admin import credentials, db
+
+#Firebase 콘솔에서 비밀키를 생성하고 파일 다운로드 -> key json 파일로 인증
+cred = credentials.Certificate("C:\\Users\\User\\test\\templates\\serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+	"databaseURL" : "https://casptone-a2cbe-default-rtdb.firebaseio.com/"
+})
+
+#---------------------------데베 부분
+#---------------------------알림 부분
+#알림을 위한 설정
+#registration_id = "eBAOp5UUQxiuA6F9NsKc5T:APA91bGomx0X63bpVmgoeLlVSfN-YJ4U6EeW_xlnVow0QrtuZQGuaOScLzXcmrRDo8n8ItoRMgn-T48ntTINPRIc8le20IIV_9GQY_-jlibIGHwblXiQ4Vx5Htu2YaehJLJt4e3CHTcQ"
+push_service = FCMNotification(
+api_key="AAAAOYtUnXk:APA91bGSzC-3SOeVbEgiu3uV_udbcGYk2vzKW9UpCdEghFsMrQBzoePYinKJBrU9HHWeL0EvMRhdarnXcE3rHxtQWqJt5z4EAKJecSCtVL1rHMNTDKQQq1eM3XbZZrEgLHDkx36p3wT2")
+mk = db.reference('users/testid99/token') # 데베에서 토큰값 불러오기
+sk = db.reference('users/fcmcheck/token') # 데베에서 토큰값 불러오기
+
+registration_ids = [mk.get(),sk.get()] # 토큰값 추가
+#---------------------------알림 부분
 
 # print('serial ' + serial.__version__)
 
@@ -31,6 +54,7 @@ storage = firebase.storage()
 
 app = Flask(__name__)
 
+pushtest = 1
 
 @app.route("/")
 def index():
@@ -38,7 +62,7 @@ def index():
 
 
 def gen():
-    #PORT = 'COM7'
+    #PORT = 'COM4'
     #BaudRate = 9600
 
     #ARD = serial.Serial(PORT, BaudRate)
@@ -76,7 +100,7 @@ def gen():
 
     threshold = 0.1
     input_source = 0
-    cap = cv2.VideoCapture(input_source)
+    cap = cv2.VideoCapture("C:\\openpose\\examples\\media\\fall.mp4")
     hasFrame, frame = cap.read()
     vid_writer = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 10,
                                  (frame.shape[1], frame.shape[0]))
@@ -139,7 +163,7 @@ def gen():
                 keypoints.append(maxLoc + (probMap[maxLoc[1], maxLoc[0]],))
             # getKeyPoints
 
-            print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
+            # print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
             if keypointsMapping[part] == "Neck":
                 mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
                 mapMask = np.uint8(mapSmooth > threshold)
@@ -255,7 +279,7 @@ def gen():
                 # Append the detected connections to the global list
                 valid_pairs.append(valid_pair)
             else:  # If no keypoints are detected
-                print("No Connection : k = {}".format(k))
+                # print("No Connection : k = {}".format(k))
                 invalid_pairs.append(k)
                 valid_pairs.append([])
         # getValidPairs
@@ -304,30 +328,37 @@ def gen():
                 # 기울기 계산
                 if colors[i] == [0, 255, 0]:
                     # calculate_degree
-                    dx = B[0] - B[0]
-                    dy = A[1] - A[1]
+                    dx = B[1] - B[0]
+                    dy = A[1] - A[0]
                     rad = math.atan2(abs(dy), abs(dx))
 
                     deg = rad * 180 / math.pi
 
                     if deg < 45:
                         string = "bend"
-                        cv2.putText(frame, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
+                        cv2.putText(frameClone, string, (0, 25), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 255))
                         print(f"[degree] {deg} ({string})")
                         op = 'a'
                         #ARD.write(op.encode())
                     elif deg > 45:
                         op = 'b'
                         #ARD.write(op.encode())
-                    # calculate_degree
 
-        if pre_Y - present_Y > 500:  # 숫자가 커질수록 민감도 높아짐
+        if pre_Y - present_Y > 900:  # 숫자가 커질수록 민감도 높아짐
             print("fall!!!!!!!!!!!!!!!!!!!!!!!!!!")
             filename = datetime.datetime.now().strftime("%H-%M-%S")
             foldername = datetime.datetime.now().strftime("%F")
             cv2.imwrite("C:\\capture\\ " + str(filename) + ".png", frame)  # 데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
             storage.child(str(foldername) + "/" + str(filename) + ".png" + ".png").put("C:\\capture\\ " + str(filename) + ".png")
             
+            timeMsg = datetime.datetime.now().strftime("%H시-%M분-%S초 발생")
+            message_title = "낙상 발생"
+            message_body = "낙상 발생 " + timeMsg
+            #result = push_service.notify_multiple_devices(registration_ids=registration_ids,
+            #                                              message_title=message_title, message_body=message_body)
+            result = push_service.notify_topic_subscribers(topic_name="news", message_title=message_title,
+                                 message_body=message_body)
+
         pre_Y = present_Y
         present_Y = 0
 
