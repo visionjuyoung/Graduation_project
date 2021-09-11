@@ -351,9 +351,10 @@ def gen():
             cv2.imwrite("C:\\capture\\ " + str(filename) + ".png", frame)  # 데스크탑에 저장 >> 파이어 베이스 업로드로 변경하면됨
             storage.child(str(foldername) + "/" + str(filename) + ".png" + ".png").put("C:\\capture\\ " + str(filename) + ".png")
             
-            timeMsg = datetime.datetime.now().strftime("%H시-%M분-%S초 발생")
+            #timeMsg = datetime.datetime.now().strftime("%H시-%M분-%S초 발생")
             message_title = "낙상 발생"
-            message_body = "낙상 발생 " + timeMsg
+            message_body = "낙상 발생 " + filename
+            # + timeMsg
             #result = push_service.notify_multiple_devices(registration_ids=registration_ids,
             #                                              message_title=message_title, message_body=message_body)
             result = push_service.notify_topic_subscribers(topic_name="news", message_title=message_title,
