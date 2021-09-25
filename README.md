@@ -2,7 +2,7 @@
 주제 : 지능형 CCTV를 사용한 요양원 관리  
 5 팀 (김민규, 김주영, 박세경)  
 트렐로 주소 : https://trello.com/b/DLkKbCis/project  
-유튜브 링크 : https://youtu.be/MmZ5kISzGqw
+시연 동영상 : https://youtu.be/MmZ5kISzGqw
 ### 시스템 구성
 > ### 하드웨어
 > Raspberry Pi 4B 4G
